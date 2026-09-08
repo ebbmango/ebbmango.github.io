@@ -4,6 +4,17 @@
 	const quoteSolid = icons['square-quote'].sharp.solid;
 	const quoteLight = icons['square-quote'].sharp.regular;
 	const hanziSolid = icons['language'].sharp.solid;
+	const verbariumSolid = icons['graduation-cap'].sharp.solid;
+
+	let dots = $state('');
+
+	$effect(() => {
+		const interval = setInterval(() => {
+			dots = dots.length === 3 ? '' : dots + '.';
+		}, 1000);
+
+		return () => clearInterval(interval);
+	});
 </script>
 
 <div class="flex h-dvh w-full flex-col items-center justify-center">
@@ -20,7 +31,7 @@
 				</svg>
 				<div class="link-text duration-300 group-hocus:translate-x-1">
 					<span class="uppercase">Quote//Slicer</span>
-					<span>Work in Progress 🚧</span>
+					<span class="opacity-50">MVP is live now! 🎉</span>
 				</div>
 			</a>
 		</li>
@@ -40,7 +51,6 @@
 				</div>
 			</a>
 		</li>
-
 		<li>
 			<div class="link opacity-30">
 				<svg class="h-18 w-18 shrink-0 fill-current" viewBox={hanziSolid['view-box']}>
@@ -50,9 +60,25 @@
 				</svg>
 				<div class="link-text">
 					<span class="uppercase">Hanzi//Slicer</span>
-					<span>Coming soon</span>
+					<span>Planning phase<span class="whitespace-pre">{dots.padEnd(3, ' ')}</span>✏️</span>
 				</div>
 			</div>
+		</li>
+		<li>
+			<a
+				class="link group opacity-75 duration-300 hocus:opacity-90"
+				href="https://ebbmango.github.io/verbarium"
+			>
+				<svg class="h-18 w-18 shrink-0 fill-current" viewBox={verbariumSolid['view-box']}>
+					{#each verbariumSolid.paths as path}
+						<path d={path} />
+					{/each}
+				</svg>
+				<div class="link-text duration-300 group-hocus:translate-x-1">
+					<span class="uppercase">Verbarium</span>
+					<span class="opacity-50">Work in Progress 🚧</span>
+				</div>
+			</a>
 		</li>
 	</ul>
 </div>
