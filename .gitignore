@@ -23,4 +23,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Font Awesome Pro Icons
-/lib/assets/icons.json
+icons.json

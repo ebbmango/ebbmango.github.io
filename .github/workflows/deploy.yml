@@ -17,6 +17,70 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Restore proprietary icons
+        env:
+          ICONS_JSON_B64: ${{ secrets.ICONS_JSON_B64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${ICONS_JSON_B64:-}" ]]; then
+            echo "Error: ICONS_JSON_B64 is not set." >&2
+            exit 1
+          fi
+
+          umask 077
+          mkdir -p src/lib/assets
+          temporary_icons="$(mktemp src/lib/assets/icons.json.XXXXXX)"
+          trap 'rm -f "$temporary_icons"' EXIT
+
+          if ! printf '%s' "$ICONS_JSON_B64" | base64 --decode > "$temporary_icons"; then
+            echo "Error: ICONS_JSON_B64 could not be decoded." >&2
+            exit 1
+          fi
+
+          mv "$temporary_icons" src/lib/assets/icons.json
+          trap - EXIT
+
+      - name: Validate proprietary icons
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+
+          const required = [
+            ['square-quote', 'sharp', 'regular'],
+            ['square-quote', 'sharp', 'solid'],
+            ['language', 'sharp', 'solid']
+          ];
+
+          let icons;
+          try {
+            icons = JSON.parse(await readFile('src/lib/assets/icons.json', 'utf8'));
+          } catch {
+            console.error('Error: restored icons file is not valid JSON.');
+            process.exit(1);
+          }
+
+          const invalid = required.filter(([name, style, weight]) => {
+            const definition = icons?.[name]?.[style]?.[weight];
+            return (
+              !definition ||
+              !Object.hasOwn(definition, 'view-box') ||
+              !Array.isArray(definition.paths) ||
+              definition.paths.length === 0
+            );
+          });
+
+          if (invalid.length > 0) {
+            console.error(
+              'Error: missing or invalid required icon definitions:',
+              invalid.map((parts) => parts.join(' / ')).join(', ')
+            );
+            process.exit(1);
+          }
+
+          console.log(`Validated ${required.length} required icon definitions.`);
+          NODE
+
       - name: Install dependencies
         run: npm ci
 
