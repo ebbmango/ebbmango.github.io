@@ -6,11 +6,11 @@
 	const hanziSolid = icons['language'].sharp.solid;
 	const verbariumSolid = icons['graduation-cap'].sharp.solid;
 
-	let dots = $state('');
+	let visibleDots = $state(0);
 
 	$effect(() => {
 		const interval = setInterval(() => {
-			dots = dots.length === 3 ? '' : dots + '.';
+			visibleDots = (visibleDots + 1) % 4;
 		}, 1000);
 
 		return () => clearInterval(interval);
@@ -19,6 +19,7 @@
 
 <div class="flex h-dvh w-full flex-col items-center justify-center">
 	<ul class="flex flex-col gap-6">
+	<!-- Quote Slicer -->
 		<li>
 			<a
 				class="link group opacity-75 duration-300 hocus:opacity-90"
@@ -35,6 +36,7 @@
 				</div>
 			</a>
 		</li>
+		<!-- Quote Slicer Docs -->
 		<li>
 			<a
 				class="link group opacity-75 duration-300 hocus:opacity-90"
@@ -51,6 +53,7 @@
 				</div>
 			</a>
 		</li>
+		<!-- Hanzi Slicer -->
 		<li>
 			<div class="link opacity-30">
 				<svg class="h-18 w-18 shrink-0 fill-current" viewBox={hanziSolid['view-box']}>
@@ -60,10 +63,11 @@
 				</svg>
 				<div class="link-text">
 					<span class="uppercase">Hanzi//Slicer</span>
-					<span>Planning phase<span class="whitespace-pre">{dots.padEnd(3, ' ')}</span>✏️</span>
+					<span>Planning phase<span aria-hidden="true">{#each [1, 2, 3] as dot}<span class:invisible={dot > visibleDots}>.</span>{/each}</span>✏️</span>
 				</div>
 			</div>
 		</li>
+		<!-- Verbarium -->
 		<li>
 			<a
 				class="link group opacity-75 duration-300 hocus:opacity-90"
